@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-xl mx-auto p-6 bg-slate-900 text-slate-100">
+    <div class="flex justify-between items-center mb-6 pb-3 border-b border-slate-800">
+        <h2 class="text-2xl font-bold">Appointment Details</h2>
+        <a href="{% url 'doc_home' %}" class="text-sm text-slate-400 hover:underline">Back</a>
+    </div>
+
+    <div class="p-6 rounded bg-slate-800/40 border-l-4 {% if appointment.status == 'Cancelled' %} border-rose-900/60 {% elif appointment.status == 'Confirmed' %} border-emerald-500 {% elif appointment.status == 'Pending' %} border-amber-500 {% elif appointment.status == 'Completed' %} border-blue-500 {% endif %}">
+        <div class="flex justify-between items-start mb-6">
+            <div>
+                <h3 class="text-lg font-bold text-slate-100">{{ appointment.patient.name }}</h3>
+                <p class="text-base text-slate-400">Age: {{ appointment.patient.age }}</p>
+            </div>
+            <span class="text-xs uppercase font-bold tracking-wider px-3 py-1 rounded {% if appointment.status == 'Cancelled' %} bg-rose-500/10 text-rose-400 {% elif appointment.status == 'Confirmed' %} bg-emerald-500/10 text-emerald-400 {% elif appointment.status == 'Pending' %} bg-amber-500/10 text-amber-400 {% elif appointment.status == 'Completed' %} bg-blue-500/10 text-blue-400 {% endif %}">
+                {{ appointment.status }}
+            </span>
+        </div>
+
+        <div class="space-y-3 text-base border-t border-slate-800 pt-4 text-slate-200">
+            <p><span class="text-slate-500 font-medium">Doctor:</span> Dr. {{ appointment.doctor.name }} ({{ appointment.doctor.specialty }})</p>
+            <p><span class="text-slate-500 font-medium">Room:</span> {{ appointment.doctor.room }}</p>
+            <p><span class="text-slate-500 font-medium">Date:</span> {{ appointment.appointment_time|date:"M d, Y" }}</p>
+            <p><span class="text-slate-500 font-medium">Time:</span> {{ appointment.appointment_time|time:"g:i A" }}</p>
+        </div>
+
+        {% if appointment.status == 'Pending' %}
+            <form method="post" action="{% url 'mark_confirmed' appointment.pk %}" class="mt-6">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-800 py-2 rounded font-bold transition duration-150 text-center">
+                    Confirm Appointment
+                </button>
+            </form>
+        {% endif %}
+
+        {% if appointment.status == 'Confirmed' %}
+            <form method="post" action="{% url 'mark_completed' appointment.pk %}" class="mt-6">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-800 py-2 rounded font-bold transition duration-150 text-center">
+                    Complete Appointment
+                </button>
+            </form>
+        {% endif %}
+
+        {% if appointment.status == 'Confirmed' or appointment.status == 'Pending' %}
+            <form method="post" action="{% url 'mark_cancelled' appointment.pk %}" class="mt-6">
+                {% csrf_token %}
+                <button type="submit" class="w-full bg-red-600 hover:bg-red-800 py-2 rounded font-bold transition duration-150 text-center">
+                    Cancel Appointment
+                </button>
+            </form>
+        {% endif %}
+    </div>
+</body>
+</html>

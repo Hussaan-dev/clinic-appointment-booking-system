@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="max-w-xl mx-auto p-6 bg-slate-900 text-slate-100">
+
+    <div class="flex justify-between items-center mb-8 border-b border-slate-800 pb-2">
+        <h1 class="text-2xl font-bold">Your Appointments</h1>
+    </div>
+
+    <!-- Confirmed Section -->
+    <div class="mb-8">
+        <h2 class="text-sm uppercase tracking-wider font-bold text-emerald-400 mb-3 pl-1">Confirmed</h2>
+        <div class="space-y-3">
+            {% for app in confirmed_appointments %}
+                <a href="{% url 'doc_appointment_detail' app.pk %}" class="flex justify-between items-center p-4 rounded bg-slate-800/40 hover:bg-slate-800 border-l-4 border-emerald-500">
+                    <div>
+                        <span class="text-base text-slate-100 block">{{ app.patient.name }}</span>
+                        <h3 class="text-sm font-bold">{{ app.appointment_time|date:"M d, Y" }}</h3>
+                    </div>
+                    <span class="text-xs uppercase font-bold px-2 py-1 rounded bg-emerald-500/10 text-emerald-400">
+                        {{ app.appointment_time|time:"g:i A" }}
+                    </span>
+                </a>
+            {% empty %}
+                <p class="text-sm text-slate-400 italic pl-1">No confirmed appointments.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Pending Section -->
+    <div class="mb-8">
+        <h2 class="text-sm uppercase tracking-wider font-bold text-amber-400 mb-3 pl-1">Pending</h2>
+        <div class="space-y-3">
+            {% for app in pending_appointments %}
+                <a href="{% url 'doc_appointment_detail' app.pk %}" class="flex justify-between items-center p-4 rounded bg-slate-800/40 hover:bg-slate-800 border-l-4 border-amber-500">
+                    <div>
+                        <span class="text-base text-slate-100 block">{{ app.patient.name }}</span>
+                        <h3 class="text-sm font-bold">{{ app.appointment_time|date:"M d, Y" }}</h3>
+                    </div>
+                    <span class="text-xs uppercase font-bold px-2 py-1 rounded bg-amber-500/10 text-amber-400">
+                        {{ app.appointment_time|time:"g:i A" }}
+                    </span>
+                </a>
+            {% empty %}
+                <p class="text-sm text-slate-400 italic pl-1">No pending appointments.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Completed Section -->
+    <div class="mb-8">
+        <h2 class="text-sm uppercase tracking-wider font-bold text-blue-400 mb-3 pl-1">Completed</h2>
+        <div class="space-y-3">
+            {% for app in completed_appointments %}
+                <a href="{% url 'doc_appointment_detail' app.pk %}" class="flex justify-between items-center p-4 rounded bg-slate-800/40 hover:bg-slate-800 border-l-4 border-blue-500">
+                    <div>
+                        <span class="text-base text-slate-100 block">{{ app.patient.name }}</span>
+                        <h3 class="text-sm font-bold">{{ app.appointment_time|date:"M d, Y" }}</h3>
+                    </div>
+                    <span class="text-xs uppercase font-bold px-2 py-1 rounded bg-blue-500/10 text-blue-400">
+                        {{ app.appointment_time|time:"g:i A" }}
+                    </span>
+                </a>
+            {% empty %}
+                <p class="text-sm text-slate-400 italic pl-1">No completed appointments.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Cancelled Section -->
+    <div class="mb-8">
+        <h2 class="text-sm uppercase tracking-wider font-bold text-slate-300 mb-3 pl-1">Cancelled</h2>
+        <div class="space-y-3">
+            {% for app in cancelled_appointments %}
+                <a href="{% url 'doc_appointment_detail' app.pk %}" class="flex justify-between items-center p-4 rounded bg-slate-800/40 hover:bg-slate-800 border-l-4 border-slate-400 opacity-80">
+                    <div>
+                        <span class="text-base text-slate-100 block"><s>{{ app.patient.name }}</s></span>
+                        <h3 class="text-sm font-bold">{{ app.appointment_time|date:"M d, Y" }}</h3>
+                    </div>
+                    <span class="text-xs uppercase font-bold px-2 py-1 rounded bg-slate-800 text-slate-300">
+                        {{ app.appointment_time|time:"g:i A" }}
+                    </span>
+                </a>
+            {% empty %}
+                <p class="text-sm text-slate-400 italic pl-1">No cancelled appointments.</p>
+            {% endfor %}
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'logout' %}" class="mt-8 text-center">
+        {% csrf_token %}
+        <button type="submit" class="text-sm text-red-500 hover:underline">
+            Sign Out
+        </button>
+    </form>
+
+</body>
+</html>
