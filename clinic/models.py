@@ -29,6 +29,14 @@ class Appointment(models.Model):
 
     status=models.CharField(max_length=20,choices=STATUS_CHOICES,default="Pending")
 
+    class Meta:
+        unique_together= ('doctor','appointment_time')
+
+    @property
+    def end_time(self):
+        from datetime import timedelta
+        return self.appointment_time+timedelta(minutes=30)
+
     def __str__(self):
         return f"{self.patient.name} → Dr.{self.doctor.name} ({self.appointment_time:%b %d %Y, %I:%M %p})"
 

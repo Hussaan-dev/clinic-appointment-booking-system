@@ -23,7 +23,7 @@
         <div class="space-y-3 text-base border-t border-slate-800 pt-4 text-slate-200">
             <p><span class="text-slate-500 font-medium">Room:</span> {{ appointment.doctor.room }}</p>
             <p><span class="text-slate-500 font-medium">Date:</span> {{ appointment.appointment_time|date:"M d, Y" }}</p>
-            <p><span class="text-slate-500 font-medium">Time:</span> {{ appointment.appointment_time|time:"g:i A" }}</p>
+            <p><span class="text-slate-500 font-medium">Time:</span> {{ appointment.appointment_time|time:"g:i A" }} - {{ appointment.end_time|time:"g:i A" }} </p>
         </div>
         
         {% if appointment.status == 'Confirmed' or appointment.status == 'Pending' %}
