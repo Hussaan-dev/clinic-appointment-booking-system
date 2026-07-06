@@ -1,10 +1,13 @@
 from django.urls import reverse_lazy
-from django.views.generic import ListView,CreateView,DetailView,TemplateView,UpdateView
+from django.views.generic import CreateView,DetailView,TemplateView,UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Appointment,Doctor,Patient
 from .forms import AppointmentForm
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
+from datetime import datetime,date,timedelta
+from django.utils import timezone
+
 
 class SignUpView(CreateView):
     form_class=UserCreationForm
@@ -51,16 +54,42 @@ class PatientHomeView(LoginRequiredMixin,TemplateView):
         context["cancelled_appointments"] = appointments.filter(status="Cancelled").order_by('-appointment_time')
         return context
 
+class BookAppointmentView(LoginRequiredMixin,TemplateView):
+    template_name='clinic/book_app.html'
 
-class AppointmentCreateView(LoginRequiredMixin,CreateView):
-    model=Appointment
-    template_name='clinic/create_app.html'
-    form_class=AppointmentForm
-    success_url=reverse_lazy('home')
+    def get_context_data(self,**kwargs):
+        context=super().get_context_data(**kwargs)
+        context['doctors']=Doctor.objects.all()
+        doctor_id=self.request.GET.get('doctor')
+        date_str=self.request.GET.get('date')
+        context['selected_doctor_id']=doctor_id
+        
+        if doctor_id and date_str:
+            doctor=Doctor.objects.get(pk=doctor_id)
+            selected_date=datetime.strptime(date_str,'%Y-%m-%d').date()
+            context['slots']=get_available_slots(doctor,selected_date)
+            context['selected_date']=date_str
+        return context
+
+class AppointmentCreateView(LoginRequiredMixin, CreateView):
+    model = Appointment
+    template_name = 'clinic/create_app.html'
+    form_class = AppointmentForm
+    success_url = reverse_lazy('home')
+
+    def get_initial(self):
+        initial = super().get_initial()
+        doctor_id = self.request.GET.get('doctor')
+        time_str = self.request.GET.get('time')
+        if doctor_id:
+            initial['doctor'] = doctor_id
+        if time_str:
+            initial['appointment_time'] = time_str
+        return initial
 
     def form_valid(self, form):
-        patient=Patient.objects.get(user=self.request.user)
-        form.instance.patient=patient
+        patient = Patient.objects.get(user=self.request.user)
+        form.instance.patient = patient
         return super().form_valid(form)
     
 class PatientAppointmentDetailView(LoginRequiredMixin,DetailView):
@@ -113,3 +142,18 @@ def patient_cancel(request,pk):
         appointment.status="Cancelled"
         appointment.save()
         return redirect("patient_appointment_detail",pk=pk)
+
+def get_available_slots(doctor,date):
+    slots=[]
+    start= datetime.combine(date,datetime.min.time()).replace(hour=9)
+    end= datetime.combine(date,datetime.min.time()).replace(hour=17)
+
+    while start<end:
+        slots.append(timezone.make_aware(start))
+        start+= timedelta(minutes=30)
+
+    booked_time=doctor.appointments.filter(appointment_time__date=date
+                    ).values_list('appointment_time',flat=True) #returns list otherwise would return list of tuples w/o flat=True
+    
+    available=[s for s in slots if s not in booked_time]
+    return available
