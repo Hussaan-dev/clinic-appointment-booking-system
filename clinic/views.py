@@ -16,7 +16,7 @@ class SignUpView(CreateView):
 
 def home(request):
     if not request.user.is_authenticated:
-        return redirect('home')
+        return redirect('login')
     if hasattr(request.user,"patient"):
         return redirect('patient_home')
     if hasattr(request.user,"doctor"):
@@ -63,7 +63,7 @@ class BookAppointmentView(LoginRequiredMixin,TemplateView):
         doctor_id=self.request.GET.get('doctor')
         date_str=self.request.GET.get('date')
         context['selected_doctor_id']=doctor_id
-        
+
         if doctor_id and date_str:
             doctor=Doctor.objects.get(pk=doctor_id)
             selected_date=datetime.strptime(date_str,'%Y-%m-%d').date()
