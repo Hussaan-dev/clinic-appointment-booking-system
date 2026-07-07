@@ -4,7 +4,7 @@ from .models import Doctor,Appointment
 class DoctorSerializer(serializers.ModelSerializer):
     class Meta:
         model=Doctor
-        fields=['id','user','name','room','specialty']
+        fields=['id','name','room','specialty'] #removed user
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:
