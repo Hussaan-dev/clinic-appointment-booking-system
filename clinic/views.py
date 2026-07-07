@@ -7,7 +7,27 @@ from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
 from datetime import datetime,date,timedelta
 from django.utils import timezone
+from .serializers import DoctorSerializer,AppointmentSerializer
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated,AllowAny
 
+class AppointmentViewSet(viewsets.ModelViewSet):
+    serializer_class=AppointmentSerializer
+    permission_classes=[IsAuthenticated]
+    http_method_names = ['get', 'patch', 'head']  # no post,put,delete
+
+    def get_queryset(self): #overrides queryset=Appointment.objects.all() and uses basename in urls
+        user=self.request.user
+        if hasattr(user,'patient'):
+            return user.patient.appointments.all()
+        elif hasattr(user,'doctor'):
+            return user.doctor.appointments.all()
+        return Appointment.objects.none()
+
+class DoctorViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset=Doctor.objects.all()
+    serializer_class=DoctorSerializer
+    permission_classes=[AllowAny]
 
 class SignUpView(CreateView):
     form_class=UserCreationForm

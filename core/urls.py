@@ -15,9 +15,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path,include
 from clinic import views
 from django.contrib.auth import views as auth_views
+from rest_framework.routers import DefaultRouter
+
+router=DefaultRouter()
+router.register('appointments',views.AppointmentViewSet,basename='appointment')
+router.register('doctors',views.DoctorViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,4 +41,5 @@ urlpatterns = [
     path('doctor/appointment/<int:pk>/mark_completed/',views.mark_completed,name='mark_completed'),
     path('doctor/appointment/<int:pk>/mark_cancelled/',views.mark_cancelled,name='mark_cancelled'),
     path('patient/appointment/<int:pk>/mark_cancelled/',views.patient_cancel,name='patient_cancel'),
+    path('api/',include(router.urls)),
 ]
