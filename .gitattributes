@@ -1,0 +1,9 @@
+# Exclude templates and static files from language stats
+*.html linguist-vendored
+static/* linguist-vendored
+staticfiles/* linguist-vendored
+*.css linguist-vendored
+*.js linguist-vendored
+
+# Optionally exclude migrations (auto-generated, not hand-written)
+*/migrations/*.py linguist-generated
