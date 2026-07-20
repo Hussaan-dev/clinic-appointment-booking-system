@@ -56,3 +56,13 @@ This project pushed me to work through a real timezone bug (`USE_TZ = True` caus
 - Configurable doctor working hours (currently hardcoded 9 AM–5 PM)
 - Email notifications for booking confirmations
 - API doesn't let you create bookings yet — only the website flow has the real validation (no past dates, valid time slots, etc.) built in
+
+## Screenshots
+
+| Patient Dashboard | Book Appointment |
+|-------------------|------------------|
+| ![](images/patient-dashboard.png) | ![](images/booking-page.png) |
+
+| Doctor Dashboard | Appointment Details (Doc POV)|
+|------------------|---------------------|
+| ![](images/doctor-dashboard.png) | ![](images/appointment-details.png) |
