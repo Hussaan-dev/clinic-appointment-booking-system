@@ -191,5 +191,5 @@ def get_available_slots(doctor,date):
     booked_time=doctor.appointments.filter(appointment_time__date=date
                     ).values_list('appointment_time',flat=True) #returns list otherwise would return list of tuples w/o flat=True
     
-    available=[s for s in slots if s not in booked_time]
+    available=[s for s in slots if s not in booked_time and s> timezone.now()]
     return available
