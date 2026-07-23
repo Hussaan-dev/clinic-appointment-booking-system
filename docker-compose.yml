@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: clinicsystem
+      POSTGRES_USER: hussaan
+      POSTGRES_PASSWORD: devpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data 
+    
+  web:
+    build: .
+    command: gunicorn core.wsgi --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DEBUG: "False"
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      DATABASE_URL: "postgres://hussaan:devpassword@db:5432/clinicsystem"
+      SECRET_KEY: "django-insecure-b=l**04q$$t*8p#)jp&%nuuhmh2o9%9^$$l+4(q-(&v&762_pd7f"
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
