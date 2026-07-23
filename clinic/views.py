@@ -1,11 +1,11 @@
 from django.urls import reverse_lazy
-from django.views.generic import CreateView,DetailView,TemplateView,UpdateView
+from django.views.generic import CreateView,DetailView,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Appointment,Doctor,Patient
 from .forms import AppointmentForm
 from django.contrib.auth.forms import UserCreationForm
 from django.shortcuts import redirect
-from datetime import datetime,date,timedelta
+from datetime import datetime,timedelta
 from django.utils import timezone
 from .serializers import DoctorSerializer,AppointmentSerializer
 from rest_framework import viewsets
@@ -74,6 +74,11 @@ class PatientHomeView(LoginRequiredMixin,TemplateView):
         context["cancelled_appointments"] = appointments.filter(status="Cancelled").order_by('-appointment_time')
         return context
 
+    def dispatch(self, request, *args, **kwargs):
+        if hasattr(request.user,"doctor"):
+            return redirect("doc_home")
+        return super().dispatch(request, *args, **kwargs)
+
 class BookAppointmentView(LoginRequiredMixin,TemplateView):
     template_name='clinic/book_app.html'
 
@@ -117,6 +122,9 @@ class PatientAppointmentDetailView(LoginRequiredMixin,DetailView):
     template_name='clinic/patient_app_detail.html'
     context_object_name='appointment'
 
+    def get_queryset(self):
+        return Appointment.objects.filter(patient__user=self.request.user)
+
 class DocHomeView(LoginRequiredMixin,TemplateView):
     template_name="clinic/doc_home.html"
 
@@ -129,11 +137,19 @@ class DocHomeView(LoginRequiredMixin,TemplateView):
         context["completed_appointments"] = appointments.filter(status="Completed").order_by('-appointment_time')
         context["cancelled_appointments"] = appointments.filter(status="Cancelled").order_by('-appointment_time')
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        if hasattr(request.user,"patient"):
+            return redirect("patient_home")
+        return super().dispatch(request, *args, **kwargs)
     
 class DocAppointmentDetailView(LoginRequiredMixin,DetailView):
     model=Appointment
     template_name='clinic/doc_app_detail.html'
     context_object_name='appointment'
+
+    def get_queryset(self):
+        return Appointment.objects.filter(doctor__user=self.request.user)
     
 def mark_confirmed(request,pk):
     if request.method=='POST':
