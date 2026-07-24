@@ -2,8 +2,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView,DetailView,TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Appointment,Doctor,Patient
-from .forms import AppointmentForm
-from django.contrib.auth.forms import UserCreationForm
+from .forms import AppointmentForm,SignUpForm
 from django.shortcuts import redirect
 from datetime import datetime,timedelta
 from django.utils import timezone
@@ -30,7 +29,7 @@ class DoctorViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes=[AllowAny]
 
 class SignUpView(CreateView):
-    form_class=UserCreationForm
+    form_class=SignUpForm
     template_name='registration/signup.html'
     success_url=reverse_lazy('login')
 
